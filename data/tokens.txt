@@ -1,0 +1,6 @@
+        known_tokens = {
+            "0x176211869ca2b568f2a7d4ee941e073a821ee1ff": ("USDC", 6),
+            "0xa219439258ca9da29e9cc4ce5596924745e12b93": ("USDT", 6),
+            "0x3ff47c5bf409c86533fe1f4907524d304062428d": ("EURe", 18),
+            "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f": ("WETH", 18),
+        }
