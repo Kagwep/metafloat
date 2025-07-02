@@ -1,0 +1,650 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_reputationReader",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_reputationContract",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "OwnableInvalidOwner",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "eligible",
+				"type": "bool"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "maxTier",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "maxAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint16",
+				"name": "interestRate",
+				"type": "uint16"
+			}
+		],
+		"name": "LoanEligibilityChecked",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "tier",
+				"type": "uint8"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint16",
+						"name": "minOverallReputation",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minConsistencyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minLoyaltyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minReliabilityScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint8",
+						"name": "minTrustLevel",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLoanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "baseInterestRate",
+						"type": "uint16"
+					}
+				],
+				"indexed": false,
+				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
+				"name": "config",
+				"type": "tuple"
+			}
+		],
+		"name": "TierConfigUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "blacklisted",
+				"type": "bool"
+			}
+		],
+		"name": "UserBlacklisted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint16",
+				"name": "adjustment",
+				"type": "uint16"
+			}
+		],
+		"name": "UserRiskAdjusted",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "CONSISTENCY_WEIGHT",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "LOYALTY_WEIGHT",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "MIN_ACTIVITY_SCORE",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "MIN_PLATFORM_TENURE_DAYS",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "OVERALL_WEIGHT",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "RELIABILITY_WEIGHT",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint16",
+				"name": "adjustmentBasisPoints",
+				"type": "uint16"
+			}
+		],
+		"name": "adjustUserRisk",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "blacklistedUsers",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "checkLoanEligibility",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "eligible",
+						"type": "bool"
+					},
+					{
+						"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+						"name": "maxTier",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "interestRate",
+						"type": "uint16"
+					},
+					{
+						"internalType": "string[]",
+						"name": "requirements",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "reasons",
+						"type": "string[]"
+					}
+				],
+				"internalType": "struct MetaFloatLoanEligibility.LoanEligibility",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "tier",
+				"type": "uint8"
+			}
+		],
+		"name": "getTierConfig",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint16",
+						"name": "minOverallReputation",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minConsistencyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minLoyaltyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minReliabilityScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint8",
+						"name": "minTrustLevel",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLoanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "baseInterestRate",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserRiskAdjustment",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "isUserBlacklisted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "reputationContract",
+		"outputs": [
+			{
+				"internalType": "contract MetaFloatReputation",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "reputationReader",
+		"outputs": [
+			{
+				"internalType": "contract MetaFloatReputationReader",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "blacklisted",
+				"type": "bool"
+			}
+		],
+		"name": "setUserBlacklisted",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"name": "tierConfigs",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "minOverallReputation",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint16",
+				"name": "minConsistencyScore",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint16",
+				"name": "minLoyaltyScore",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint16",
+				"name": "minReliabilityScore",
+				"type": "uint16"
+			},
+			{
+				"internalType": "uint8",
+				"name": "minTrustLevel",
+				"type": "uint8"
+			},
+			{
+				"internalType": "uint256",
+				"name": "maxLoanAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint16",
+				"name": "baseInterestRate",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "tier",
+				"type": "uint8"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint16",
+						"name": "minOverallReputation",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minConsistencyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minLoyaltyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minReliabilityScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint8",
+						"name": "minTrustLevel",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLoanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "baseInterestRate",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
+				"name": "config",
+				"type": "tuple"
+			}
+		],
+		"name": "updateTierConfig",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "userRiskAdjustment",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]

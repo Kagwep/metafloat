@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Users, TrendingUp, Zap, CheckCircle, ArrowRight, Star, Globe, Lock, Award, BarChart3, ChevronDown, Wallet, User, Activity } from 'lucide-react';
+import { Shield, Users, TrendingUp, Zap, CheckCircle, ArrowRight, Star, Globe, Lock, Award, BarChart3, ChevronDown, Wallet, User, Activity, DollarSign } from 'lucide-react';
 import { useAccount, useConnect, useDisconnect } from "wagmi"
 import { Link } from 'react-router-dom';
+import Navigation from '../componets/Navigation';
 
-
-const MetaSenseHomepage = () => {
+const MetaFloatHomepage = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
   const { address } = useAccount()
-  const { connectors, connect } = useConnect()
-  const { disconnect } = useDisconnect()
-    const [showDropdown, setShowDropdown] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
   const [copySuccess, setCopySuccess] = useState(false)
 
   useEffect(() => {
@@ -23,28 +19,7 @@ const MetaSenseHomepage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-    const truncate = (addr) => addr.slice(0, 6) + '...' + addr.slice(-4)
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(address)
-    setCopySuccess(true)
-    setTimeout(() => setCopySuccess(false), 1000)
-  }
-  // Mock wallet connection
-  const connectWallet = async () => {
-    try {
-      const mockAddress = '0x1234...5678';
-      setWalletAddress(mockAddress);
-      setWalletConnected(true);
-    } catch (error) {
-      console.error('Wallet connection failed:', error);
-    }
-  };
-
-  const disconnectWallet = () => {
-    setWalletConnected(false);
-    setWalletAddress('');
-  };
 
   const features = [
     {
@@ -60,9 +35,9 @@ const MetaSenseHomepage = () => {
       color: "from-purple-500 to-pink-500"
     },
     {
-      icon: Globe,
-      title: "Composable Identity",
-      description: "One MetaSense ID works across all DeFi protocols",
+      icon: DollarSign,
+      title: "Micro Lending",
+      description: "Uncollateralized loans based on reputation scores",
       color: "from-green-500 to-emerald-500"
     },
     {
@@ -75,187 +50,36 @@ const MetaSenseHomepage = () => {
 
   const useCases = [
     {
+      icon: DollarSign,
+      title: "Cash Advances",
+      description: "Instant micro-loans based on your MetaFloat reputation score",
+      benefits: ["$50-$1000 loans", "6-15% APR", "No collateral needed"]
+    },
+    {
       icon: TrendingUp,
       title: "Lending & Borrowing",
-      description: "Dynamic LTV ratios and risk-adjusted rates based on reputation",
-      benefits: ["Up to 85% LTV", "Reduced rates", "Faster approvals"]
+      description: "Dynamic rates and limits based on behavioral reputation",
+      benefits: ["Reputation-based rates", "Progressive limits", "Instant approval"]
     },
     {
       icon: Award,
       title: "Governance & DAOs",
       description: "Sybil-resistant voting with reputation-weighted governance",
       benefits: ["One human, one vote", "Weighted governance", "Trust delegation"]
-    },
-    {
-      icon: Star,
-      title: "Airdrops & Distribution",
-      description: "Fair token distribution to verified humans only",
-      benefits: ["Anti-farming", "Bonus allocations", "Real community"]
     }
   ];
 
   const trustLevels = [
-    { name: "Bronze", range: "0-199", color: "bg-amber-600", benefits: "Standard access" },
-    { name: "Silver", range: "200-499", color: "bg-gray-400", benefits: "2-5% fee reduction" },
-    { name: "Gold", range: "500-799", color: "bg-yellow-500", benefits: "15% benefits + governance" },
-    { name: "Platinum", range: "800-1000", color: "bg-purple-600", benefits: "25% benefits + premium access" }
+    { name: "Bronze", range: "0-399", color: "bg-amber-600", benefits: "Up to $50 • 15% APR" },
+    { name: "Silver", range: "400-599", color: "bg-gray-400", benefits: "Up to $200 • 12% APR" },
+    { name: "Gold", range: "600-849", color: "bg-yellow-500", benefits: "Up to $1000 • 9% APR" },
+    { name: "Platinum", range: "850-1000", color: "bg-purple-600", benefits: "Up to $1000 • 6% APR" }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-800' : 'bg-transparent'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-            <Link to='/'>
-            <span className="text-xl font-bold text-white">MetaSense</span>
-            </Link>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#home" className="text-slate-300 hover:text-white transition-colors">Home</a>
-              <a href="#features" className="text-slate-300 hover:text-white transition-colors">Features</a>
-              <a href="#use-cases" className="text-slate-300 hover:text-white transition-colors">Use Cases</a>
-              <Link to='/reputation'>
-              <a href="#reputation" className="text-slate-300 hover:text-white transition-colors flex items-center space-x-1">
-                <User className="w-4 h-4" />
-                <span>Reputation</span>
-              </a>
-              </Link>
-              {/* <a href="#docs" className="text-slate-300 hover:text-white transition-colors">Docs</a> */}
-              
-                 <div className="relative inline-block text-left">
-    {address ? (
-        <div className="flex items-center space-x-3 bg-white border px-4 py-2 rounded-lg shadow">
-            <span className="font-mono text-sm text-gray-800">{truncate(address)}</span>
-
-            <button
-                onClick={handleCopy}
-                className="text-sm text-blue-500 hover:underline"
-            >
-                {copySuccess ? 'Copied!' : 'Copy'}
-            </button>
-
-            <button
-                onClick={() => disconnect()}
-                className="text-sm text-red-500 hover:underline"
-            >
-                Disconnect
-            </button>
-        </div>
-    ) : (
-        <div>
-            <button
-                onClick={() => setShowDropdown((prev) => !prev)}
-                className="relative bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/25 flex items-center space-x-2 shadow-lg overflow-hidden group"
-            >
-                <Wallet className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="relative z-10">Connect Wallet</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out"></div>
-                <svg 
-                    className={`w-4 h-4 transition-all duration-300 group-hover:translate-y-0.5 ${showDropdown ? 'rotate-180' : ''}`}
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-
-            {showDropdown && (
-                <div className="absolute mt-3 w-64 rounded-xl shadow-2xl bg-white ring-1 ring-gray-200 z-20 overflow-hidden border border-gray-100 animate-[fadeInUp_0.2s_ease-out] origin-top-right">
-                    <style jsx>{`
-                        @keyframes fadeInUp {
-                            from {
-                                opacity: 0;
-                                transform: translateY(-10px) scale(0.95);
-                            }
-                            to {
-                                opacity: 1;
-                                transform: translateY(0) scale(1);
-                            }
-                        }
-                    `}</style>
-                    <div className="bg-gradient-to-r from-cyan-50 to-purple-50 px-4 py-3 border-b border-gray-100">
-                        <h3 className="text-sm font-semibold text-gray-800">Choose Wallet</h3>
-                        <p className="text-xs text-gray-600 mt-1">Select your preferred wallet to connect</p>
-                    </div>
-                    
-                    <div className="py-2">
-                        {connectors.map((connector, index) => (
-                            <button
-                                key={connector.uid}
-                                onClick={() => {
-                                    connect({ connector })
-                                    setShowDropdown(false)
-                                }}
-                                className="group w-full text-left px-4 py-3 text-gray-800 hover:bg-gradient-to-r hover:from-cyan-50 hover:to-purple-50 hover:cursor-pointer transition-all duration-300 flex items-center space-x-3 border-b border-gray-50 last:border-b-0 relative overflow-hidden hover:scale-[1.02] hover:shadow-lg hover:shadow-cyan-500/10"
-                                style={{
-                                    animationDelay: `${index * 50}ms`,
-                                    animation: 'slideInLeft 0.3s ease-out forwards'
-                                }}
-                            >
-                                <div className="w-8 h-8 bg-gradient-to-r from-cyan-100 to-purple-100 rounded-lg flex items-center justify-center group-hover:from-cyan-200 group-hover:to-purple-200 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 group-hover:shadow-md">
-                                    <Wallet className="w-4 h-4 text-gray-600 group-hover:text-gray-700 transition-colors duration-300" />
-                                </div>
-                                
-                                <div className="flex-1">
-                                    <div className="font-medium text-gray-900 group-hover:text-gray-800 group-hover:translate-x-1 transition-all duration-300">
-                                        {connector.name}
-                                    </div>
-                                    <div className="text-xs text-gray-500 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300 delay-75">
-                                        Connect with {connector.name.toLowerCase()}
-                                    </div>
-                                </div>
-                                
-                                <svg 
-                                    className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" 
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                </svg>
-                                
-                                {/* Hover shine effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 ease-out"></div>
-                            </button>
-                        ))}
-                    </div>
-                    
-                    <div className="bg-gray-50 px-4 py-2 border-t border-gray-100">
-                        <style jsx>{`
-                            @keyframes slideInLeft {
-                                from {
-                                    opacity: 0;
-                                    transform: translateX(-20px);
-                                }
-                                to {
-                                    opacity: 1;
-                                    transform: translateX(0);
-                                }
-                            }
-                        `}</style>
-                        <p className="text-xs text-gray-500 text-center">
-                            Make sure you have your wallet extension installed
-                        </p>
-                    </div>
-                </div>
-            )}
-        </div>
-    )}
-</div>
-
-            </div>
-          </div>
-        </div>
-      </nav>
-
+      
+      <Navigation />
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -267,27 +91,26 @@ const MetaSenseHomepage = () => {
             
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
               <span className="bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
-                Decentralized Identity
+                Decentralized Reputation
               </span>
               <br />
-              <span className="text-slate-200">for DeFi</span>
+              <span className="text-slate-200">and Borrowing</span>
             </h1>
             
             <p className="text-xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Transform MetaMask card spending data into verifiable on-chain identity and reputation. 
-              Build trust, eliminate bots, and unlock reputation-based benefits across the entire DeFi ecosystem.
+              Transform MetaMask card spending data into verifiable on-chain reputation. 
+              Get instant micro-loans without collateral based on your behavioral patterns and trust score.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button 
-                onClick={connectWallet}
-                className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 shadow-2xl"
-              >
-                <Wallet className="w-5 h-5" />
-                <span>Connect Wallet</span>
-              </button>
+              <Link to="/advance">
+                <button className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 shadow-2xl">
+                  <DollarSign className="w-5 h-5" />
+                  <span>Get Cash Advance</span>
+                </button>
+              </Link>
               <button className="border-2 border-slate-600 text-slate-300 px-8 py-4 rounded-xl text-lg font-semibold hover:border-slate-500 hover:text-white transition-all duration-300 flex items-center space-x-2">
-                <span>Read Docs</span>
+                <span>Learn More</span>
                 <Globe className="w-5 h-5" />
               </button>
             </div>
@@ -301,7 +124,7 @@ const MetaSenseHomepage = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Revolutionary Features</h2>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Built on proven MetaMask card data to create the most reliable identity layer in DeFi
+              Built on proven MetaMask card data to create the most reliable reputation-based lending in DeFi
             </p>
           </div>
           
@@ -327,9 +150,9 @@ const MetaSenseHomepage = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-800/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Trust Levels</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">Loan Tiers</h2>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Earn better benefits as your reputation grows from Bronze to Platinum
+              Earn better loan terms as your reputation grows from Bronze to Platinum
             </p>
           </div>
           
@@ -354,7 +177,7 @@ const MetaSenseHomepage = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">Powerful Use Cases</h2>
             <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Unlock new possibilities across the DeFi ecosystem with verified identity and reputation
+              Unlock new financial opportunities with verified reputation and behavioral scoring
             </p>
           </div>
           
@@ -389,18 +212,22 @@ const MetaSenseHomepage = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 p-12 rounded-3xl border border-slate-600 backdrop-blur-sm">
-            <h2 className="text-4xl font-bold text-white mb-6">Ready to Build the Future of DeFi?</h2>
+            <h2 className="text-4xl font-bold text-white mb-6">Ready to Access Instant Credit?</h2>
             <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-              Join the MetaSense ecosystem and help create a more trusted, human-centric DeFi experience.
+              Join MetaFloat and experience reputation-based lending with no collateral required.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl">
-                Start Integration
-              </button>
-              <button className="border-2 border-slate-600 text-slate-300 px-8 py-4 rounded-xl text-lg font-semibold hover:border-slate-500 hover:text-white transition-all duration-300">
-                View Documentation
-              </button>
+              <Link to="/advance">
+                <button className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl">
+                  Get Your First Advance
+                </button>
+              </Link>
+              <Link to="/reputation">
+                <button className="border-2 border-slate-600 text-slate-300 px-8 py-4 rounded-xl text-lg font-semibold hover:border-slate-500 hover:text-white transition-all duration-300">
+                  Check Your Reputation
+                </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -414,7 +241,7 @@ const MetaSenseHomepage = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">MetaSense Protocol</span>
+              <span className="text-xl font-bold text-white">MetaFloat Protocol</span>
             </div>
             <div className="flex items-center space-x-6">
               <a href="#" className="text-slate-400 hover:text-white transition-colors">Discord</a>
@@ -424,7 +251,7 @@ const MetaSenseHomepage = () => {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-800 text-center text-slate-400">
-            <p>&copy; 2025 MetaSense Protocol. Built with ❤️ for the DeFi community.</p>
+            <p>&copy; 2025 MetaFloat Protocol. Built with ❤️ for the DeFi community.</p>
           </div>
         </div>
       </footer>
@@ -432,4 +259,4 @@ const MetaSenseHomepage = () => {
   );
 };
 
-export default MetaSenseHomepage;
+export default MetaFloatHomepage;

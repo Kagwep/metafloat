@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./MetaSenseID.sol";
-
+import "./MetaFloatID.sol";
 /**
- * @title MetaSenseReputation Contract
+ * @title MetaFloatReputation Contract
  * @dev Main contract for storing and managing user reputation scores
  */
-contract MetaSenseReputation is Ownable, ReentrancyGuard {
+contract MetaFloatReputation is Ownable, ReentrancyGuard {
     
     // Enums matching Python implementation
     enum TrustLevel { Bronze, Silver, Gold, Platinum }
@@ -43,8 +41,8 @@ contract MetaSenseReputation is Ownable, ReentrancyGuard {
     mapping(address => UserProfile) public userProfiles;
     mapping(address => bool) public authorizedUpdaters;
     
-    // MetaSenseID contract reference
-    MetaSenseID public metaSenseID;
+    // MetaFloat contract reference
+    MetaFloat public metaFloat;
     
     // Constants
     uint256 public constant REPUTATION_VALIDITY_PERIOD = 30 days;
@@ -60,10 +58,10 @@ contract MetaSenseReputation is Ownable, ReentrancyGuard {
     event UserVerified(address indexed user, uint256 timestamp);
     event AuthorizedUpdaterAdded(address indexed updater);
     event AuthorizedUpdaterRemoved(address indexed updater);
-    event MetaSenseIDContractUpdated(address indexed newContract);
+    event MetaFloatContractUpdated(address indexed newContract);
     
-    constructor(address _metaSenseIDContract) Ownable(msg.sender) {
-        metaSenseID = MetaSenseID(_metaSenseIDContract);
+    constructor(address _metaFloatContract) Ownable(msg.sender) {
+        metaFloat = MetaFloat(_metaFloatContract);
         authorizedUpdaters[msg.sender] = true;
     }
     
@@ -112,9 +110,9 @@ contract MetaSenseReputation is Ownable, ReentrancyGuard {
             reasoningTags: reasoningTags
         });
         
-        // Issue MetaSenseID for new users
-        if (isNewUser && !metaSenseID.hasMetaSenseID(user)) {
-            try metaSenseID.issueMetaSenseID(user) {
+        // Issue MetaFloat for new users
+        if (isNewUser && !metaFloat.hasMetaFloat(user)) {
+            try metaFloat.issueMetaFloat(user) {
                 emit UserVerified(user, block.timestamp);
             } catch {
                 // Continue even if NFT issuance fails
@@ -127,7 +125,6 @@ contract MetaSenseReputation is Ownable, ReentrancyGuard {
     /**
      * @dev Batch update multiple users (gas efficient)
      */
-
     
     /**
      * @dev Get user reputation score
@@ -226,9 +223,9 @@ contract MetaSenseReputation is Ownable, ReentrancyGuard {
         emit AuthorizedUpdaterRemoved(updater);
     }
     
-    function setMetaSenseIDContract(address _metaSenseIDContract) external onlyOwner {
-        metaSenseID = MetaSenseID(_metaSenseIDContract);
-        emit MetaSenseIDContractUpdated(_metaSenseIDContract);
+    function setMetaFloatContract(address _metaFloatContract) external onlyOwner {
+        metaFloat = MetaFloat(_metaFloatContract);
+        emit MetaFloatContractUpdated(_metaFloatContract);
     }
     
     /**

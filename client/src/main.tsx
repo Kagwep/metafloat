@@ -9,7 +9,7 @@ import { metaMask } from "wagmi/connectors";
 
 const config = createConfig({
   ssr: true, // Make sure to enable this for server-side rendering (SSR) applications.
-  chains: [mainnet, linea, lineaSepolia],
+  chains: [lineaSepolia,mainnet, linea],
   connectors: [metaMask()],
   transports: {
     [mainnet.id]: http(),

@@ -16,7 +16,8 @@ class RateLimiter:
         current_time = time.time()
         time_since_last_call = current_time - self.last_call_time
         
-        if time_since_last_call < self.min_interval:
+        # Always wait the full interval for steady pulses (skip only on first call)
+        if self.last_call_time > 0 and time_since_last_call < self.min_interval:
             sleep_time = self.min_interval - time_since_last_call
             print(f"  ⏳ Rate limiting: sleeping {sleep_time:.2f}s...")
             time.sleep(sleep_time)
@@ -167,33 +168,48 @@ class MetamaskCardTransactionCollector:
             'apikey': self.api_key
         }
         
-        try:
-            response = requests.get(self.base_url, params=params)
-            data = response.json()
-            
-            if data.get('status') == '1':
-                transactions = []
-                for tx in data.get('result', []):
-                    transactions.append({
-                        'hash': tx.get('hash'),
-                        'timestamp': datetime.fromtimestamp(int(tx.get('timeStamp', 0))).isoformat(),
-                        'from_address': tx.get('from'),
-                        'to_address': tx.get('to'),
-                        'block_number': int(tx.get('blockNumber', 0)),
-                        'gas_used': int(tx.get('gasUsed', 0)),
-                        'gas_price': int(tx.get('gasPrice', 0)),
-                        'input_data': tx.get('input', '')
-                    })
-                    
-                return transactions
-            else:
-                print(f"API Error: {data.get('message', 'Unknown error')}")
-                return []
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # Add timeout to prevent SSL hangs
+                response = requests.get(self.base_url, params=params, timeout=(5, 15))
+                data = response.json()
                 
-        except Exception as e:
-            print(f"Error getting contract transactions: {e}")
-            return []
-        
+                if data.get('status') == '1':
+                    transactions = []
+                    for tx in data.get('result', []):
+                        transactions.append({
+                            'hash': tx.get('hash'),
+                            'timestamp': datetime.fromtimestamp(int(tx.get('timeStamp', 0))).isoformat(),
+                            'from_address': tx.get('from'),
+                            'to_address': tx.get('to'),
+                            'block_number': int(tx.get('blockNumber', 0)),
+                            'gas_used': int(tx.get('gasUsed', 0)),
+                            'gas_price': int(tx.get('gasPrice', 0)),
+                            'input_data': tx.get('input', '')
+                        })
+                        
+                    return transactions
+                else:
+                    print(f"API Error: {data.get('message', 'Unknown error')}")
+                    return []
+                    
+            except requests.exceptions.Timeout:
+                print(f"⏰ Timeout on attempt {attempt + 1}/{max_retries} for contract transactions")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+                    continue
+                else:
+                    print("❌ All retry attempts failed for contract transactions")
+                    return []
+            except Exception as e:
+                print(f"Error getting contract transactions (attempt {attempt + 1}): {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)
+                    continue
+                else:
+                    return []
+             
     def discover_settlement_addresses(self, sample_transactions):
         """Discover settlement addresses by analyzing transaction patterns (RATE LIMITED)"""
         print("🔍 Analyzing transaction patterns to discover settlement addresses...")
@@ -245,22 +261,38 @@ class MetamaskCardTransactionCollector:
             'apikey': self.api_key
         }
         
-        try:
-            response = requests.get(self.base_url, params=params)
-            data = response.json()
-            
-            if data.get('result'):
-                logs = data['result'].get('logs', [])
-                transfers = self.decode_all_transfer_events(logs)
-                return transfers
-            else:
-                print(f"No receipt for {tx_hash}")
-                return []
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # Add timeout to prevent SSL hangs
+                response = requests.get(self.base_url, params=params, timeout=(3, 10))
+                data = response.json()
                 
-        except Exception as e:
-            print(f"Error getting transaction receipt for {tx_hash}: {e}")
-            return []
-        
+                if data.get('result'):
+                    logs = data['result'].get('logs', [])
+                    transfers = self.decode_all_transfer_events(logs)
+                    return transfers
+                else:
+                    print(f"No receipt for {tx_hash}")
+                    return []
+                    
+            except requests.exceptions.Timeout:
+                print(f"⏰ Timeout on attempt {attempt + 1}/{max_retries} for {tx_hash}")
+                if attempt < max_retries - 1:
+                    time.sleep(1)  # Short delay between retries
+                    continue
+                else:
+                    print(f"❌ All retry attempts failed for {tx_hash}, returning empty list")
+                    return []  # Return empty list instead of crashing
+            except Exception as e:
+                print(f"Error getting transaction receipt for {tx_hash} (attempt {attempt + 1}): {e}")
+                if attempt < max_retries - 1:
+                    time.sleep(1)
+                    continue
+                else:
+                    print(f"❌ Final attempt failed for {tx_hash}, returning empty list")
+                    return []
+            
     def decode_all_transfer_events(self, logs):
         """Decode ALL ERC-20 Transfer events from transaction logs"""
         # ERC-20 Transfer event signature: Transfer(address,address,uint256)
