@@ -2,6 +2,12 @@ import { BarChart3, CheckCircle, Award, TrendingUp, Activity } from 'lucide-reac
 
 export const META_FLOAT_REPUTATION_CONTRACT_ADDRES = "0x8d6884DF71818AC93ead8c8b51b39f7140D6fBdD"
 
+export const META_LOAN_ELIGIBILITY_CONTRACT_ADDRESS = "0xc90aCA99D882e0f37E641480390c8cb784259CFF"
+
+
+export const META_LOAN_MANAGER_ADDRESS = "0x1693bd8866eE37772E90C79F873D34A8Bd027c7C"
+
+export const META_USDC_ADDRESS = "0xc6e1FB449b08B26B2063c289DF9BBcb79B91c992"
 
 
 export const getScoreCategories = (scores: any) => [

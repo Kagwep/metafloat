@@ -1,98 +1,265 @@
-import React, { useState, useEffect } from 'react';
-import { DollarSign, Shield, Zap, Users, CheckCircle, AlertCircle, ArrowLeft, Wallet, User } from 'lucide-react';
+// pages/MetaFloatAdvancePage.tsx (With Modal Sidebar)
+import React, { useState } from 'react';
+import { DollarSign, ArrowLeft, Shield, Zap, Users, TrendingUp, Info, X, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAccount, useConnect } from 'wagmi';
 import Navigation from '../componets/Navigation';
+import { ActiveLoansTable } from '../componets/ActiveLoansTable';
+import { LoanEligibilityChecker } from '../componets/LoanEligibilityChecker';
+import { LoanRequestForm } from '../componets/LoanRequestForm';
+import { META_USDC_ADDRESS } from '../constants';
 
-interface LoanEligibility {
-  eligible: boolean;
-  maxTier: string;
-  maxAmount: string;
-  interestRate: number;
-  requirements: string[];
-  reasons: string[];
+
+// Modal Component
+interface LoanInfoModalProps {
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-interface Token {
-  symbol: string;
-  name: string;
-  icon: string;
-}
+const LoanInfoModal: React.FC<LoanInfoModalProps> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-2xl border border-slate-600 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-600">
+          <h2 className="text-2xl font-bold text-white flex items-center space-x-2">
+            <Info className="w-6 h-6 text-cyan-400" />
+            <span>Loan Information</span>
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-8">
+          
+          {/* How It Works */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
+              <Zap className="w-5 h-5 text-cyan-400" />
+              <span>How It Works</span>
+            </h3>
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-cyan-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">1</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Check Your Reputation</h4>
+                  <p className="text-slate-300 leading-relaxed">
+                    Your MetaFloat reputation score (built from MetaMask Card transaction history) 
+                    determines your loan eligibility and maximum borrowing amount. Higher scores unlock larger loans.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">2</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Approve Token Spending</h4>
+                  <p className="text-slate-300 leading-relaxed">
+                    Approve the loan contract to spend your USDC for automatic repayment. 
+                    This covers the principal plus 1% interest (calculated for 30 days).
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-4">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">3</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Receive Instant Cash</h4>
+                  <p className="text-slate-300 leading-relaxed">
+                    Get USDC deposited directly to your wallet immediately. 
+                    The loan is automatically collected after 30 days if you have sufficient balance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Loan Features */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5 text-green-400" />
+              <span>Loan Features</span>
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <DollarSign className="w-4 h-4 text-green-400" />
+                  </div>
+                  <span className="font-semibold text-white">Fixed Rate</span>
+                </div>
+                <p className="text-slate-300 text-sm">1% APR for all loan tiers - no variable rates</p>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <Zap className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="font-semibold text-white">Instant Funding</span>
+                </div>
+                <p className="text-slate-300 text-sm">Receive USDC immediately after approval</p>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <span className="font-semibold text-white">No Collateral</span>
+                </div>
+                <p className="text-slate-300 text-sm">Loans based purely on reputation trust</p>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                    <Users className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  <span className="font-semibold text-white">Auto Collection</span>
+                </div>
+                <p className="text-slate-300 text-sm">Automatic repayment after 30 days</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Loan Tiers */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-6 flex items-center space-x-2">
+              <Users className="w-5 h-5 text-purple-400" />
+              <span>Loan Tiers & Requirements</span>
+            </h3>
+            <div className="space-y-4">
+              <div className="bg-gradient-to-r from-green-500/10 to-green-600/10 p-4 rounded-xl border border-green-500/30">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-white text-lg">Micro Tier</h4>
+                    <p className="text-green-400 font-semibold">Up to $25 USDC</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white font-bold">1% APR</div>
+                    <div className="text-green-400 text-sm">30 days</div>
+                  </div>
+                </div>
+                <div className="space-y-1 text-sm text-slate-300">
+                  <div>• Minimum 600 overall reputation</div>
+                  <div>• Minimum 600 consistency score</div>
+                  <div>• Bronze tier or higher</div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 p-4 rounded-xl border border-blue-500/30">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-white text-lg">Small Tier</h4>
+                    <p className="text-blue-400 font-semibold">Up to $50 USDC</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white font-bold">1% APR</div>
+                    <div className="text-blue-400 text-sm">30 days</div>
+                  </div>
+                </div>
+                <div className="space-y-1 text-sm text-slate-300">
+                  <div>• Minimum 700 overall reputation</div>
+                  <div>• Minimum 700 consistency score</div>
+                  <div>• Bronze tier or higher</div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-500/10 to-purple-600/10 p-4 rounded-xl border border-purple-500/30">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-white text-lg">Medium Tier</h4>
+                    <p className="text-purple-400 font-semibold">Up to $200 USDC</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white font-bold">1% APR</div>
+                    <div className="text-purple-400 text-sm">30 days</div>
+                  </div>
+                </div>
+                <div className="space-y-1 text-sm text-slate-300">
+                  <div>• Minimum 800 overall reputation</div>
+                  <div>• Minimum 800 consistency score</div>
+                  <div>• Silver tier or higher</div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 p-4 rounded-xl border border-yellow-500/30">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <h4 className="font-bold text-white text-lg">Large Tier</h4>
+                    <p className="text-yellow-400 font-semibold">Up to $1,000 USDC</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white font-bold">1% APR</div>
+                    <div className="text-yellow-400 text-sm">30 days</div>
+                  </div>
+                </div>
+                <div className="space-y-1 text-sm text-slate-300">
+                  <div>• Minimum 950 overall reputation</div>
+                  <div>• Minimum 950 consistency score</div>
+                  <div>• Gold tier or higher</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Important Notes */}
+          <section>
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center space-x-2">
+              <HelpCircle className="w-5 h-5 text-yellow-400" />
+              <span>Important Notes</span>
+            </h3>
+            <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl">
+              <ul className="space-y-2 text-slate-300 text-sm">
+                <li>• Only 1 active loan allowed per wallet at a time</li>
+                <li>• Loans are automatically collected after 30 days if you have sufficient balance</li>
+                <li>• Interest is calculated as 1% APR for exactly 30 days</li>
+                <li>• Your reputation must be current (recently updated) to qualify</li>
+                <li>• Minimum activity score of 100 required for all loans</li>
+              </ul>
+            </div>
+          </section>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-slate-600 bg-slate-800/50">
+          <button
+            onClick={onClose}
+            className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300"
+          >
+            Got It!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const MetaFloatAdvancePage: React.FC = () => {
-  const [selectedToken, setSelectedToken] = useState<string>('USDC');
-  const [requestAmount, setRequestAmount] = useState<string>('');
-  const [eligibility, setEligibility] = useState<LoanEligibility | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [userAddress, setUserAddress] = useState<string>('');
-
-  const tokens: Token[] = [
-    { symbol: 'USDC', name: 'USD Coin', icon: '🇺🇸' },
-    { symbol: 'aUSDC', name: 'Aave USDC', icon: '🏛️' },
-    { symbol: 'USDT', name: 'Tether USD', icon: '🟢' },
-    { symbol: 'WETH', name: 'Wrapped Ethereum', icon: '🔷' },
-    { symbol: 'EURe', name: 'Euro Token', icon: '🇪🇺' },
-    { symbol: 'GBPe', name: 'British Pound Token', icon: '🇬🇧' }
-  ];
-
-  const connectWallet = async () => {
-    try {
-      const mockAddress = '0x1234567890123456789012345678901234567890';
-      setUserAddress(mockAddress);
-      setWalletConnected(true);
-    } catch (error) {
-      console.error('Wallet connection failed:', error);
+  const { address, isConnected } = useAccount();
+  const { connectors, connect } = useConnect();
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  
+  // Environment variables
+  const USDC_ADDRESS = META_USDC_ADDRESS;
+  
+  const connectWallet = () => {
+    if (connectors[0]) {
+      connect({ connector: connectors[0] });
     }
   };
 
-  const disconnectWallet = () => {
-    setWalletConnected(false);
-    setUserAddress('');
-  };
-
-  const truncate = (addr: string) => addr.slice(0, 6) + '...' + addr.slice(-4);
-
-  // Mock eligibility check - replace with actual contract call
-  const checkEligibility = async () => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setEligibility({
-      eligible: true,
-      maxTier: 'Small',
-      maxAmount: '200',
-      interestRate: 12,
-      requirements: ['Min reputation score', 'Valid MetaFloat ID'],
-      reasons: ['Qualified for Small tier', 'Strong consistency', 'Reliable user']
-    });
-    
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    if (walletConnected) {
-      checkEligibility();
-    }
-  }, [walletConnected]);
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (/^\d*\.?\d*$/.test(value)) {
-      setRequestAmount(value);
-    }
-  };
-
-  const handleRequestAdvance = () => {
-    console.log(`Requesting ${requestAmount} ${selectedToken}`);
-    // Add contract interaction logic here
-  };
-
-  const isValidAmount = () => {
-    const amount = parseFloat(requestAmount);
-    const maxAmount = eligibility ? parseFloat(eligibility.maxAmount) : 0;
-    return amount > 0 && amount <= maxAmount;
+  const handleLoanSuccess = () => {
+    console.log('Loan request successful!');
   };
 
   return (
@@ -103,257 +270,116 @@ const MetaFloatAdvancePage: React.FC = () => {
       {/* Header */}
       <div className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4 mb-6">
-            <button className="text-slate-400 hover:text-white transition-colors">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-white">Cash Advance</h1>
-                <p className="text-slate-300">Get instant loans based on your MetaFloat reputation</p>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/reputation" 
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Link>
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-white">Cash Advance</h1>
+                  <p className="text-slate-300">Get instant loans based on your MetaFloat reputation</p>
+                </div>
               </div>
             </div>
+            
+            {/* Learn More Button */}
+            {isConnected && (
+              <button
+                onClick={() => setShowInfoModal(true)}
+                className="flex items-center space-x-2 bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 hover:text-white px-4 py-2 rounded-xl border border-slate-600 hover:border-slate-500 transition-all duration-300"
+              >
+                <Info className="w-4 h-4" />
+                <span>Learn More</span>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        {!walletConnected ? (
-          // Wallet Connection Required
+        {!isConnected ? (
+          /* Wallet Connection Required */
           <div className="max-w-2xl mx-auto">
-            <div className="bg-slate-800/50 rounded-2xl border border-slate-700 p-12 text-center">
+            <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-2xl border border-slate-600 p-12 text-center backdrop-blur-sm">
               <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Wallet className="h-8 w-8 text-white" />
+                <DollarSign className="h-8 w-8 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h2>
-              <p className="text-slate-300 mb-8">
-                Connect your wallet to check your MetaFloat reputation and request a cash advance
+              <p className="text-slate-300 mb-8 leading-relaxed">
+                Connect your wallet to check your MetaFloat reputation and request instant cash advances 
+                with competitive rates based on your on-chain reputation.
               </p>
               <button
                 onClick={connectWallet}
-                className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-cyan-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-2xl"
               >
                 Connect Wallet
               </button>
             </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
+          /* Main Dashboard */
+          <div className="space-y-8">
             
-            {/* Main Request Form */}
-            <div className="lg:col-span-2">
-              <div className="bg-slate-800/50 rounded-2xl border border-slate-700 p-8">
-                <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-white mb-3">Request Your Advance</h2>
-                  <p className="text-slate-300">Get instant cash based on your MetaFloat reputation score</p>
-                </div>
-
-                {/* Token Selection */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-slate-200 mb-4">
-                    Select Token
-                  </label>
-                  <div className="grid grid-cols-3 gap-4">
-                    {tokens.map((token) => (
-                      <button
-                        key={token.symbol}
-                        onClick={() => setSelectedToken(token.symbol)}
-                        className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                          selectedToken === token.symbol
-                            ? 'border-cyan-500 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
-                            : 'border-slate-600 hover:border-slate-500 bg-slate-700/30'
-                        }`}
-                      >
-                        <div className="text-center">
-                          <div className="text-3xl mb-2">{token.icon}</div>
-                          <div className="font-medium text-sm text-white">{token.symbol}</div>
-                          <div className="text-xs text-slate-400">{token.name}</div>
-                        </div>
-                      </button>
-                    ))}
+            {/* Connected Wallet Info */}
+            <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 p-4 rounded-xl border border-slate-600 backdrop-blur-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-white" />
                   </div>
-                </div>
-
-                {/* Amount Input */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Amount
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={requestAmount}
-                      onChange={handleAmountChange}
-                      placeholder="0.00"
-                      className="w-full px-6 py-4 bg-slate-700/50 border border-slate-600 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-xl text-white placeholder-slate-400"
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-6">
-                      <span className="text-slate-400 text-lg font-medium">{selectedToken}</span>
+                  <div>
+                    <div className="text-white font-semibold">Wallet Connected</div>
+                    <div className="text-slate-400 font-mono text-sm">
+                      {address?.slice(0, 6)}...{address?.slice(-4)}
                     </div>
                   </div>
-                  {eligibility && (
-                    <p className="mt-3 text-sm text-slate-300">
-                      Maximum available: <span className="font-medium text-cyan-400">{eligibility.maxAmount} {selectedToken}</span>
-                    </p>
-                  )}
                 </div>
-
-                {/* Interest Rate Display */}
-                {eligibility && (
-                  <div className="mb-8 p-6 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 rounded-xl border border-cyan-500/20">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-lg font-medium text-white">Interest Rate (APR)</span>
-                      <span className="text-2xl font-bold text-cyan-400">{eligibility.interestRate}%</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">Loan Tier</span>
-                      <span className="font-medium text-white bg-slate-700/50 px-3 py-1 rounded-lg">{eligibility.maxTier}</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* Request Button */}
-                <button
-                  onClick={handleRequestAdvance}
-                  disabled={!isValidAmount() || !eligibility?.eligible}
-                  className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-300 ${
-                    isValidAmount() && eligibility?.eligible
-                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white transform hover:scale-105 shadow-lg'
-                      : 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  {isValidAmount() && eligibility?.eligible 
-                    ? `Request ${requestAmount || '0'} ${selectedToken} Advance`
-                    : 'Enter Valid Amount'
-                  }
-                </button>
+                <div className="text-green-400 text-sm font-semibold">
+                  ✅ Ready for Loans
+                </div>
               </div>
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              
-              {/* Eligibility Status */}
-              <div className="bg-slate-800/50 rounded-2xl border border-slate-700 p-6">
-                <h3 className="text-xl font-semibold text-white mb-6">Eligibility Status</h3>
-                
-                {isLoading ? (
-                  <div className="flex items-center space-x-3">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500"></div>
-                    <span className="text-slate-300">Checking eligibility...</span>
-                  </div>
-                ) : eligibility ? (
-                  <div className="space-y-6">
-                    <div className="flex items-center space-x-3">
-                      {eligibility.eligible ? (
-                        <CheckCircle className="h-6 w-6 text-green-400" />
-                      ) : (
-                        <AlertCircle className="h-6 w-6 text-red-400" />
-                      )}
-                      <span className={`font-semibold text-lg ${
-                        eligibility.eligible ? 'text-green-400' : 'text-red-400'
-                      }`}>
-                        {eligibility.eligible ? 'Eligible for Advance' : 'Not Eligible'}
-                      </span>
-                    </div>
-                    
-                    {eligibility.eligible && (
-                      <div className="space-y-3">
-                        <div className="flex justify-between text-slate-300">
-                          <span>Max Amount:</span>
-                          <span className="font-medium text-white">{eligibility.maxAmount} tokens</span>
-                        </div>
-                        <div className="flex justify-between text-slate-300">
-                          <span>Tier:</span>
-                          <span className="font-medium text-white">{eligibility.maxTier}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="border-t border-slate-600 pt-4">
-                      <h4 className="text-sm font-medium text-white mb-3">Qualification Reasons:</h4>
-                      <ul className="space-y-2">
-                        {eligibility.reasons.map((reason, index) => (
-                          <li key={index} className="text-sm text-slate-300 flex items-start">
-                            <span className="w-2 h-2 bg-cyan-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                            {reason}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+            {/* Loan Eligibility Check */}
+            <LoanEligibilityChecker className="mb-8" />
 
-              {/* How It Works */}
-              <div className="bg-slate-800/50 rounded-2xl border border-slate-700 p-6">
-                <h3 className="text-xl font-semibold text-white mb-6">How It Works</h3>
-                <div className="space-y-5">
-                  <div className="flex items-start space-x-4">
-                    <Shield className="h-6 w-6 text-cyan-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-white mb-1">Reputation Based</h4>
-                      <p className="text-sm text-slate-300">Your loan terms are based on your MetaFloat reputation score</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <Zap className="h-6 w-6 text-cyan-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-white mb-1">Instant Approval</h4>
-                      <p className="text-sm text-slate-300">Get approved and funded within minutes</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-4">
-                    <Users className="h-6 w-6 text-cyan-400 mt-1 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-white mb-1">No Collateral</h4>
-                      <p className="text-sm text-slate-300">Loans are based on trust and reputation only</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            {/* Main Content - Single Column for Cleaner Design */}
+            <div className="max-w-4xl mx-auto">
+              <LoanRequestForm 
+                tokenAddress={USDC_ADDRESS}
+                tokenSymbol="USDC"
+                onSuccess={handleLoanSuccess}
+              />
+            </div>
 
-              {/* Interest Rates */}
-              <div className="bg-slate-800/50 rounded-2xl border border-slate-700 p-6">
-                <h3 className="text-xl font-semibold text-white mb-6">Interest Rates by Tier</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center py-3 border-b border-slate-600">
-                    <div>
-                      <span className="font-medium text-white">Micro Tier</span>
-                      <div className="text-xs text-slate-400">Up to $50</div>
-                    </div>
-                    <span className="text-slate-300 font-medium">15% APR</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-slate-600">
-                    <div>
-                      <span className="font-medium text-white">Small Tier</span>
-                      <div className="text-xs text-slate-400">Up to $200</div>
-                    </div>
-                    <span className="text-slate-300 font-medium">12% APR</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3 border-b border-slate-600">
-                    <div>
-                      <span className="font-medium text-white">Medium Tier</span>
-                      <div className="text-xs text-slate-400">Up to $1000</div>
-                    </div>
-                    <span className="text-slate-300 font-medium">9% APR</span>
-                  </div>
-                  <div className="flex justify-between items-center py-3">
-                    <div>
-                      <span className="font-medium text-white">Large Tier</span>
-                      <div className="text-xs text-slate-400">Up to $1000</div>
-                    </div>
-                    <span className="text-slate-300 font-medium">6% APR</span>
-                  </div>
-                </div>
-              </div>
+            {/* Active Loans Section */}
+            <div className="mt-12">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center space-x-2">
+                <DollarSign className="w-6 h-6 text-cyan-400" />
+                <span>Your Active Loans</span>
+              </h2>
+              <ActiveLoansTable 
+                tokenAddress={USDC_ADDRESS}
+                tokenSymbol="USDC"
+              />
             </div>
           </div>
         )}
       </div>
+
+      {/* Info Modal */}
+      <LoanInfoModal 
+        isOpen={showInfoModal}
+        onClose={() => setShowInfoModal(false)}
+      />
     </div>
   );
 };

@@ -1,15 +1,24 @@
 import React from 'react';
 import { DollarSign, RefreshCw } from 'lucide-react';
+import { UpdateReputationButton } from './UpdateReputationButton';
 
 interface ActionButtonsProps {
   isLoanEligible: boolean;
+   walletAddress: `0x${string}`;
   onRefresh: () => void;
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ 
   isLoanEligible, 
+  walletAddress,
   onRefresh 
 }) => {
+    const handleUpdateSuccess = () => {
+    // Wait a moment for backend to process, then refresh blockchain data
+    setTimeout(() => {
+      onRefresh();
+    }, 2000);
+  };
   return (
     <div className="text-center">
       <div className="inline-flex flex-col sm:flex-row gap-4">
@@ -24,6 +33,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           <DollarSign className="w-5 h-5" />
           <span>{isLoanEligible ? 'Get Cash Advance' : 'Improve Scores to Qualify'}</span>
         </button>
+        <UpdateReputationButton
+          walletAddress={walletAddress}
+          onSuccess={handleUpdateSuccess}
+          variant="primary"
+          size="lg"
+        />
         <button 
           onClick={onRefresh}
           className="border-2 border-slate-600 text-slate-300 px-8 py-4 rounded-xl text-lg font-semibold hover:border-slate-500 hover:text-white transition-all duration-300 flex items-center space-x-2"

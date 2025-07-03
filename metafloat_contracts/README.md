@@ -4,4 +4,7 @@
 
 **MetaFloatReputationReader** - `0x1dCE129e73Ceb8A617F621d47044033d0A105D9A`
 
-**MetaFloatLoanEligibility** - `0x8c52B9Dcc1E3b5f2d0f2b4c3aA1a4222f622268D`
+**MetaFloatLoanEligibility** - `0xc90aCA99D882e0f37E641480390c8cb784259CFF`
+
+
+**MetaFloatLoanManager** - `0x1693bd8866eE37772E90C79F873D34A8Bd027c7C`

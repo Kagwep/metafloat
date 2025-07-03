@@ -437,7 +437,7 @@ class MetaSenseReputationEngine:
 # Usage example
 if __name__ == "__main__":
     # Initialize reputation engine
-    csv_file = "metamask_preliminary_2050of10000_20250701_010659.csv"
+    csv_file = "metamask_card_complete_spending_20250702_055722.csv"
     
     print("🚀 MetaSense Reputation Engine")
     print("="*60)

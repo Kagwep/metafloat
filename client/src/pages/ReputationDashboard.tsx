@@ -42,8 +42,7 @@ export const ReputationDashboard: React.FC<ReputationDashboardProps> = ({
         
         <ActionButtons 
           isLoanEligible={loanData.isLoanEligible}
-          onRefresh={onRefresh}
-        />
+          onRefresh={onRefresh} walletAddress={address as `0x${string}`}        />
       </div>
     </div>
   );

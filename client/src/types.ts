@@ -51,3 +51,49 @@ export interface ScoreCategory {
   maxScore: number;
   isRequired: boolean;
 }
+
+export enum LoanTier {
+  None = 0,
+  Micro = 1,
+  Small = 2,
+  Medium = 3,
+  Large = 4
+}
+
+export interface TierConfig {
+  minOverallReputation: number;
+  minConsistencyScore: number;
+  minLoyaltyScore: number;
+  minReliabilityScore: number;
+  minTrustLevel: number;
+  maxLoanAmount: bigint;
+  baseInterestRate: number;
+}
+
+export interface LoanEligibility {
+  eligible: boolean;
+  maxTier: LoanTier;
+  maxAmount: bigint;
+  interestRate: number;
+  requirements: string[];
+  reasons: string[];
+}
+
+
+export interface Loan {
+  borrower: `0x${string}`;
+  tokenAddress: `0x${string}`;
+  principalAmount: bigint;
+  interestAmount: bigint;
+  totalAmount: bigint;
+  issueTimestamp: bigint;
+  dueTimestamp: bigint;
+  isActive: boolean;
+  isRepaid: boolean;
+  isDefaulted: boolean;
+}
+
+export interface LoanCost {
+  interestAmount: bigint;
+  totalAmount: bigint;
+}

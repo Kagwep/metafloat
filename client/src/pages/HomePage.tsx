@@ -23,12 +23,6 @@ const MetaFloatHomepage = () => {
 
   const features = [
     {
-      icon: Shield,
-      title: "Proof of Humanity",
-      description: "MetaMask card ownership = KYC'd real person",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
       icon: BarChart3,
       title: "Behavioral Reputation",
       description: "Spending patterns reveal reliability and sophistication",
@@ -70,10 +64,10 @@ const MetaFloatHomepage = () => {
   ];
 
   const trustLevels = [
-    { name: "Bronze", range: "0-399", color: "bg-amber-600", benefits: "Up to $50 • 15% APR" },
-    { name: "Silver", range: "400-599", color: "bg-gray-400", benefits: "Up to $200 • 12% APR" },
-    { name: "Gold", range: "600-849", color: "bg-yellow-500", benefits: "Up to $1000 • 9% APR" },
-    { name: "Platinum", range: "850-1000", color: "bg-purple-600", benefits: "Up to $1000 • 6% APR" }
+    { name: "Bronze", range: "0-399", color: "bg-amber-600", benefits: "Up to $50 • 1% APR" },
+    { name: "Silver", range: "400-599", color: "bg-gray-400", benefits: "Up to $200 • 1% APR" },
+    { name: "Gold", range: "600-849", color: "bg-yellow-500", benefits: "Up to $1000 • 1% APR" },
+    { name: "Platinum", range: "850-1000", color: "bg-purple-600", benefits: "Up to $1000 • 1% APR" }
   ];
 
   return (
@@ -86,7 +80,7 @@ const MetaFloatHomepage = () => {
           <div className="text-center">
             <div className="inline-flex items-center space-x-2 bg-slate-800/50 rounded-full px-4 py-2 mb-8 border border-slate-700">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-slate-300 text-sm">Development Phase • Linea Network</span>
+              <span className="text-slate-300 text-sm">Development Phase • Linea sepolia Network</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
@@ -128,7 +122,7 @@ const MetaFloatHomepage = () => {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -241,7 +235,7 @@ const MetaFloatHomepage = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-purple-600 rounded-lg flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">MetaFloat Protocol</span>
+              <span className="text-xl font-bold text-white">MetaFloat </span>
             </div>
             <div className="flex items-center space-x-6">
               <a href="#" className="text-slate-400 hover:text-white transition-colors">Discord</a>
