@@ -15,7 +15,7 @@ export const useReputationData = () => {
     address: CONTRACT_ADDRESS as `0x${string}`,
     abi: MetaFloatReputionAbi,
     functionName: 'getUserProfile',
-    args: [address],
+    args: ["0x80cc263cb3fa1be2aec748b3811261c1e2a1ba8d"],
   });
 
   const { data: reputationBreakdown } = useReadContract({

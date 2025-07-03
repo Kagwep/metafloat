@@ -48,7 +48,6 @@ MetaFloatID → MetaFloatReputation → MetaFloatLoanEligibility → MetaFloatLo
 
 ### 1. **Reputation Building**
 - Connect your wallet with MetaMask Card transaction history
-- AI analyzes spending patterns, consistency, and financial behavior
 - Reputation scores are calculated and stored on-chain
 - Regular updates maintain current reputation status
 

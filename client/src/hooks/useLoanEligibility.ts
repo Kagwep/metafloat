@@ -30,7 +30,7 @@ export const useLoanEligibility = (): UseLoanEligibilityReturn => {
     address: LOAN_CONTRACT_ADDRESS as `0x${string}`,
     abi: LoanEligibilityAbi,
     functionName: 'checkLoanEligibility',
-    args: [address],
+    args: ["0x80cc263cb3fa1be2aec748b3811261c1e2a1ba8d"],
     query: {
       enabled: !!address && !!LOAN_CONTRACT_ADDRESS,
     }
