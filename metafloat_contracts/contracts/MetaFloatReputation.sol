@@ -17,12 +17,12 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
     
     // Reputation scores structure
     struct ReputationScores {
-        uint16 consistencyScore;      // 0-1000
-        uint16 loyaltyScore;         // 0-1000
-        uint16 sophisticationScore;  // 0-1000
-        uint16 activityScore;        // 0-1000
-        uint16 reliabilityScore;     // 0-1000
-        uint16 overallReputation;    // 0-1000
+        uint32 consistencyScore;      // 0-1000
+        uint32 loyaltyScore;         // 0-1000
+        uint32 sophisticationScore;  // 0-1000
+        uint32 activityScore;        // 0-1000
+        uint32 reliabilityScore;     // 0-1000
+        uint32 overallReputation;    // 0-1000
     }
     
     // User profile structure
@@ -51,7 +51,7 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
     // Events
     event UserReputationUpdated(
         address indexed user,
-        uint16 overallReputation,
+        uint32 overallReputation,
         TrustLevel trustLevel,
         UserClass userClass
     );
@@ -75,7 +75,7 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
      */
     function updateUserReputation(
         address user,
-        uint16[5] memory scores, // [consistency, loyalty, sophistication, activity, reliability]
+        uint32[5] memory scores, // [consistency, loyalty, sophistication, activity, reliability]
         TrustLevel trustLevel,
         UserClass userClass,
         string[] memory reasoningTags
@@ -84,7 +84,7 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
         require(scores[4] <= 1000, "Invalid reputation scores"); // Check last score as proxy
         
         // Calculate overall reputation (weighted average)
-        uint16 overallReputation = uint16(
+        uint32 overallReputation = uint32(
             (scores[0] * 25 + scores[1] * 25 + scores[2] * 20 + scores[3] * 15 + scores[4] * 15) / 100
         );
         
@@ -129,7 +129,7 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
     /**
      * @dev Get user reputation score
      */
-    function getUserReputation(address user) external view returns (uint16) {
+    function getUserReputation(address user) external view returns (uint32) {
         return userProfiles[user].scores.overallReputation;
     }
     
@@ -182,7 +182,7 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
     /**
      * @dev Verify user meets minimum reputation requirements
      */
-    function meetsMinimumReputation(address user, uint16 minimumScore) external view returns (bool) {
+    function meetsMinimumReputation(address user, uint32 minimumScore) external view returns (bool) {
         UserProfile memory profile = userProfiles[user];
         return profile.scores.overallReputation >= minimumScore && 
                (block.timestamp - profile.lastUpdateTimestamp) <= REPUTATION_VALIDITY_PERIOD;
@@ -192,12 +192,12 @@ contract MetaFloatReputation is Ownable, ReentrancyGuard {
      * @dev Get reputation breakdown for detailed analysis
      */
     function getReputationBreakdown(address user) external view returns (
-        uint16 consistency,
-        uint16 loyalty,
-        uint16 sophistication,
-        uint16 activity,
-        uint16 reliability,
-        uint16 overall
+        uint32 consistency,
+        uint32 loyalty,
+        uint32 sophistication,
+        uint32 activity,
+        uint32 reliability,
+        uint32 overall
     ) {
         ReputationScores memory scores = userProfiles[user].scores;
         return (

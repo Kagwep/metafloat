@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, Shield, TrendingUp, CheckCircle, XCircle, AlertTriangle, Sparkles } from 'lucide-react';
+import { DollarSign, Shield, TrendingUp, CheckCircle, XCircle, AlertTriangle, Sparkles, Circle } from 'lucide-react';
 import { useLoanEligibility } from '../hooks/useLoanEligibility';
 import type { LoanTier } from '../types';
 
@@ -205,7 +205,7 @@ export const LoanEligibilityChecker: React.FC<LoanEligibilityCheckerProps> = ({ 
               <div className="space-y-2">
                 {loanEligibility.requirements.map((requirement, index) => (
                   <div key={index} className="flex items-start space-x-2 text-slate-300">
-                    <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
                     <span>{requirement}</span>
                   </div>
                 ))}
@@ -216,7 +216,7 @@ export const LoanEligibilityChecker: React.FC<LoanEligibilityCheckerProps> = ({ 
           {/* Reasons for Ineligibility */}
           {loanEligibility.reasons.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-lg font-semibold text-white mb-3">Current Issues</h4>
+              <h4 className="text-lg font-semibold text-white mb-3">Current Requirements Not Met</h4>
               <div className="space-y-2">
                 {loanEligibility.reasons.map((reason, index) => (
                   <div key={index} className="flex items-start space-x-2 text-slate-300">

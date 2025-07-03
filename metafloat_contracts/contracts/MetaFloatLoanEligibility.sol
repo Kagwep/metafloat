@@ -21,28 +21,28 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         bool eligible;
         LoanTier maxTier;
         uint256 maxAmount; // in USDC (6 decimals)
-        uint16 interestRate; // basis points (100 = 1%)
+        uint32 interestRate; // basis points (100 = 1%)
         string[] requirements;
         string[] reasons;
     }
     
     // Loan tier configurations
     struct TierConfig {
-        uint16 minOverallReputation;
-        uint16 minConsistencyScore;
-        uint16 minLoyaltyScore;
-        uint16 minReliabilityScore;
+        uint32 minOverallReputation;
+        uint32 minConsistencyScore;
+        uint32 minLoyaltyScore;
+        uint32 minReliabilityScore;
         uint8 minTrustLevel; // 0=Bronze, 1=Silver, 2=Gold, 3=Platinum
         uint256 maxLoanAmount; // in USDC (6 decimals)
-        uint16 baseInterestRate; // basis points (fixed at 100 = 1%)
+        uint32 baseInterestRate; // basis points (fixed at 100 = 1%)
     }
     
     mapping(LoanTier => TierConfig) public tierConfigs;
     
     // Additional requirements
     uint256 public constant MIN_PLATFORM_TENURE_DAYS = 7;
-    uint16 public constant MIN_ACTIVITY_SCORE = 100;
-    uint16 public constant FIXED_INTEREST_RATE = 100; // 1% APR for all loans
+    uint32 public constant MIN_ACTIVITY_SCORE = 100;
+    uint32 public constant FIXED_INTEREST_RATE = 100; // 1% APR for all loans
     
     // Risk adjustment factors
     mapping(address => bool) public blacklistedUsers;
@@ -53,7 +53,7 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         bool eligible,
         LoanTier maxTier,
         uint256 maxAmount,
-        uint16 interestRate
+        uint32 interestRate
     );
     
     event TierConfigUpdated(LoanTier tier, TierConfig config);
@@ -256,7 +256,7 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         emit UserBlacklisted(user, blacklisted);
     }
 
-        function setMetaFloatReputionContract(address _metaFloatReputionReaderContract) external onlyAuthorizedUpdater {
+    function setMetaFloatReputionContract(address _metaFloatReputionReaderContract) external onlyAuthorizedUpdater {
         reputationReader = MetaFloatReputationReader(_metaFloatReputionReaderContract);
         emit MetaFloatReputationReaderContractUpdated(_metaFloatReputionReaderContract);
     }

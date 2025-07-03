@@ -105,9 +105,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "interestRate",
-				"type": "uint16"
+				"type": "uint32"
 			}
 		],
 		"name": "LoanEligibilityChecked",
@@ -208,24 +208,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -238,9 +238,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"indexed": false,
@@ -275,24 +275,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -305,9 +305,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -405,9 +405,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "interestRate",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "string[]",
@@ -433,9 +433,9 @@
 		"name": "FIXED_INTEREST_RATE",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "",
-				"type": "uint16"
+				"type": "uint32"
 			}
 		],
 		"stateMutability": "view",
@@ -448,24 +448,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -478,9 +478,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -490,24 +490,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -520,9 +520,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -532,24 +532,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -562,9 +562,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -574,24 +574,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -604,9 +604,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -668,24 +668,24 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minOverallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minConsistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minLoyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "minReliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
 						"internalType": "uint8",
@@ -698,9 +698,9 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "baseInterestRate",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
@@ -735,9 +735,9 @@
 		"name": "MIN_ACTIVITY_SCORE",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "",
-				"type": "uint16"
+				"type": "uint32"
 			}
 		],
 		"stateMutability": "view",
@@ -806,24 +806,24 @@
 		"name": "tierConfigs",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "minOverallReputation",
-				"type": "uint16"
+				"type": "uint32"
 			},
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "minConsistencyScore",
-				"type": "uint16"
+				"type": "uint32"
 			},
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "minLoyaltyScore",
-				"type": "uint16"
+				"type": "uint32"
 			},
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "minReliabilityScore",
-				"type": "uint16"
+				"type": "uint32"
 			},
 			{
 				"internalType": "uint8",
@@ -836,9 +836,9 @@
 				"type": "uint256"
 			},
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "baseInterestRate",
-				"type": "uint16"
+				"type": "uint32"
 			}
 		],
 		"stateMutability": "view",

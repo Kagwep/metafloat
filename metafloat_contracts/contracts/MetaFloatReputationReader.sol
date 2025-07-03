@@ -40,7 +40,7 @@ contract MetaFloatReputationReader {
     /**
      * @dev Quick reputation check for other contracts with ID validation
      */
-    function checkUserReputation(address user, uint16 minimumScore) external view returns (bool) {
+    function checkUserReputation(address user, uint32 minimumScore) external view returns (bool) {
         // Must have MetaFloat ID and meet reputation requirements
         return hasValidMetaFloatID(user) && 
                reputationContract.meetsMinimumReputation(user, minimumScore);
@@ -49,7 +49,7 @@ contract MetaFloatReputationReader {
     /**
      * @dev Comprehensive user validation (ID + verification + reputation)
      */
-    function isUserFullyVerified(address user, uint16 minimumScore) external view returns (bool) {
+    function isUserFullyVerified(address user, uint32 minimumScore) external view returns (bool) {
         return hasValidMetaFloatID(user) && 
                reputationContract.isUserVerified(user) &&
                reputationContract.meetsMinimumReputation(user, minimumScore);
@@ -94,11 +94,11 @@ contract MetaFloatReputationReader {
      */
     function checkLoanEligibility(
         address user, 
-        uint16 minimumReputation,
+        uint32 minimumReputation,
         uint8 minimumTrustLevel
     ) external view returns (
         bool eligible,
-        uint16 reputation,
+        uint32 reputation,
         uint8 trustLevel,
         bool hasID,
         bool isVerified
@@ -120,7 +120,7 @@ contract MetaFloatReputationReader {
      */
     function batchCheckEligibility(
         address[] calldata users,
-        uint16 minimumReputation
+        uint32 minimumReputation
     ) external view returns (bool[] memory eligible) {
         eligible = new bool[](users.length);
         

@@ -15,7 +15,7 @@ import "./MetaFloatLoanEligibility.sol";
 contract MetaFloatLoanManager is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     
-    MetaFloatLoanEligibility public immutable eligibilityContract;
+    MetaFloatLoanEligibility public  eligibilityContract;
     
     struct Loan {
         address borrower;
@@ -76,6 +76,7 @@ contract MetaFloatLoanManager is Ownable, ReentrancyGuard {
     event CollectorAuthorized(address indexed collector, bool authorized);
     event TokenSupported(address indexed token, bool supported);
     event LoanCollected(uint256 indexed loanId, address indexed collector, uint256 amount);
+    event MetaFloatLoanEligibilityContractUpdated(address indexed newContract);
     
     constructor(
         address _eligibilityContract
@@ -325,6 +326,11 @@ contract MetaFloatLoanManager is Ownable, ReentrancyGuard {
     function setSupportedToken(address token, bool supported) external onlyOwner {
         supportedTokens[token] = supported;
         emit TokenSupported(token, supported);
+    }
+
+    function setMetaFloatReputionContract(address _metaFloatLoanEligibility) external onlyOwner {
+        eligibilityContract = MetaFloatLoanEligibility(_metaFloatLoanEligibility);
+        emit MetaFloatLoanEligibilityContractUpdated(_metaFloatLoanEligibility);
     }
     
     /**

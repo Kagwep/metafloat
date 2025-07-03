@@ -3,19 +3,6 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "updater",
-				"type": "address"
-			}
-		],
-		"name": "addAuthorizedUpdater",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
 				"name": "_metaFloatContract",
 				"type": "address"
 			}
@@ -104,6 +91,415 @@
 		"type": "event"
 	},
 	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint32",
+				"name": "overallReputation",
+				"type": "uint32"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum MetaFloatReputation.TrustLevel",
+				"name": "trustLevel",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum MetaFloatReputation.UserClass",
+				"name": "userClass",
+				"type": "uint8"
+			}
+		],
+		"name": "UserReputationUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "UserVerified",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "MIN_REPUTATION_FOR_VERIFICATION",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "REPUTATION_VALIDITY_PERIOD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "updater",
+				"type": "address"
+			}
+		],
+		"name": "addAuthorizedUpdater",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "authorizedUpdaters",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getReputationAge",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getReputationBreakdown",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "consistency",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "loyalty",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "sophistication",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "activity",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "reliability",
+				"type": "uint32"
+			},
+			{
+				"internalType": "uint32",
+				"name": "overall",
+				"type": "uint32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserClass",
+		"outputs": [
+			{
+				"internalType": "enum MetaFloatReputation.UserClass",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserProfile",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "walletAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "verificationTimestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum MetaFloatReputation.TrustLevel",
+						"name": "trustLevel",
+						"type": "uint8"
+					},
+					{
+						"internalType": "enum MetaFloatReputation.UserClass",
+						"name": "userClass",
+						"type": "uint8"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint32",
+								"name": "consistencyScore",
+								"type": "uint32"
+							},
+							{
+								"internalType": "uint32",
+								"name": "loyaltyScore",
+								"type": "uint32"
+							},
+							{
+								"internalType": "uint32",
+								"name": "sophisticationScore",
+								"type": "uint32"
+							},
+							{
+								"internalType": "uint32",
+								"name": "activityScore",
+								"type": "uint32"
+							},
+							{
+								"internalType": "uint32",
+								"name": "reliabilityScore",
+								"type": "uint32"
+							},
+							{
+								"internalType": "uint32",
+								"name": "overallReputation",
+								"type": "uint32"
+							}
+						],
+						"internalType": "struct MetaFloatReputation.ReputationScores",
+						"name": "scores",
+						"type": "tuple"
+					},
+					{
+						"internalType": "bool",
+						"name": "isVerified",
+						"type": "bool"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lastUpdateTimestamp",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string[]",
+						"name": "reasoningTags",
+						"type": "string[]"
+					}
+				],
+				"internalType": "struct MetaFloatReputation.UserProfile",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserReputation",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "",
+				"type": "uint32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getUserTrustLevel",
+		"outputs": [
+			{
+				"internalType": "enum MetaFloatReputation.TrustLevel",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "isReputationCurrent",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "isUserVerified",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint32",
+				"name": "minimumScore",
+				"type": "uint32"
+			}
+		],
+		"name": "meetsMinimumReputation",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "metaFloat",
+		"outputs": [
+			{
+				"internalType": "contract MetaFloat",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "address",
@@ -183,9 +579,9 @@
 				"type": "address"
 			},
 			{
-				"internalType": "uint16[5]",
+				"internalType": "uint32[5]",
 				"name": "scores",
-				"type": "uint16[5]"
+				"type": "uint32[5]"
 			},
 			{
 				"internalType": "enum MetaFloatReputation.TrustLevel",
@@ -206,402 +602,6 @@
 		"name": "updateUserReputation",
 		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint16",
-				"name": "overallReputation",
-				"type": "uint16"
-			},
-			{
-				"indexed": false,
-				"internalType": "enum MetaFloatReputation.TrustLevel",
-				"name": "trustLevel",
-				"type": "uint8"
-			},
-			{
-				"indexed": false,
-				"internalType": "enum MetaFloatReputation.UserClass",
-				"name": "userClass",
-				"type": "uint8"
-			}
-		],
-		"name": "UserReputationUpdated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "timestamp",
-				"type": "uint256"
-			}
-		],
-		"name": "UserVerified",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "authorizedUpdaters",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getReputationAge",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getReputationBreakdown",
-		"outputs": [
-			{
-				"internalType": "uint16",
-				"name": "consistency",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint16",
-				"name": "loyalty",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint16",
-				"name": "sophistication",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint16",
-				"name": "activity",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint16",
-				"name": "reliability",
-				"type": "uint16"
-			},
-			{
-				"internalType": "uint16",
-				"name": "overall",
-				"type": "uint16"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getUserClass",
-		"outputs": [
-			{
-				"internalType": "enum MetaFloatReputation.UserClass",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getUserProfile",
-		"outputs": [
-			{
-				"components": [
-					{
-						"internalType": "address",
-						"name": "walletAddress",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "verificationTimestamp",
-						"type": "uint256"
-					},
-					{
-						"internalType": "enum MetaFloatReputation.TrustLevel",
-						"name": "trustLevel",
-						"type": "uint8"
-					},
-					{
-						"internalType": "enum MetaFloatReputation.UserClass",
-						"name": "userClass",
-						"type": "uint8"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint16",
-								"name": "consistencyScore",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "loyaltyScore",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "sophisticationScore",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "activityScore",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "reliabilityScore",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "overallReputation",
-								"type": "uint16"
-							}
-						],
-						"internalType": "struct MetaFloatReputation.ReputationScores",
-						"name": "scores",
-						"type": "tuple"
-					},
-					{
-						"internalType": "bool",
-						"name": "isVerified",
-						"type": "bool"
-					},
-					{
-						"internalType": "uint256",
-						"name": "lastUpdateTimestamp",
-						"type": "uint256"
-					},
-					{
-						"internalType": "string[]",
-						"name": "reasoningTags",
-						"type": "string[]"
-					}
-				],
-				"internalType": "struct MetaFloatReputation.UserProfile",
-				"name": "",
-				"type": "tuple"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getUserReputation",
-		"outputs": [
-			{
-				"internalType": "uint16",
-				"name": "",
-				"type": "uint16"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "getUserTrustLevel",
-		"outputs": [
-			{
-				"internalType": "enum MetaFloatReputation.TrustLevel",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "isReputationCurrent",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			}
-		],
-		"name": "isUserVerified",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"internalType": "uint16",
-				"name": "minimumScore",
-				"type": "uint16"
-			}
-		],
-		"name": "meetsMinimumReputation",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "metaFloat",
-		"outputs": [
-			{
-				"internalType": "contract MetaFloat",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "MIN_REPUTATION_FOR_VERIFICATION",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "REPUTATION_VALIDITY_PERIOD",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -637,34 +637,34 @@
 			{
 				"components": [
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "consistencyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "loyaltyScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "sophisticationScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "activityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "reliabilityScore",
-						"type": "uint16"
+						"type": "uint32"
 					},
 					{
-						"internalType": "uint16",
+						"internalType": "uint32",
 						"name": "overallReputation",
-						"type": "uint16"
+						"type": "uint32"
 					}
 				],
 				"internalType": "struct MetaFloatReputation.ReputationScores",
