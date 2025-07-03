@@ -18,6 +18,7 @@ contract MetaFloat is ERC721, Ownable, ReentrancyGuard {
     // Mapping from wallet address to token ID
     mapping(address => uint256) public userToTokenId;
     mapping(uint256 => address) public tokenIdToUser;
+    mapping(address => bool) public authorizedUpdaters;
     
     // Base URI for metadata
     string private _baseTokenURI;
@@ -27,10 +28,19 @@ contract MetaFloat is ERC721, Ownable, ReentrancyGuard {
     
     event MetaFloatIssued(address indexed user, uint256 indexed tokenId);
     event ReputationContractUpdated(address indexed newContract);
+    event AuthorizedUpdaterAdded(address indexed updater);
+    event AuthorizedUpdaterRemoved(address indexed updater);
     
     constructor(string memory baseURI) ERC721("MetaFloat", "MFLT") Ownable(msg.sender){
         _baseTokenURI = baseURI;
+        authorizedUpdaters[msg.sender] = true;
     }
+
+    modifier onlyAuthorizedUpdater() {
+        require(authorizedUpdaters[msg.sender], "Not authorized to update reputations");
+        _;
+    }
+    
     
     /**
      * @dev Issue MetaFloat to a new user
@@ -103,6 +113,7 @@ contract MetaFloat is ERC721, Ownable, ReentrancyGuard {
         _baseTokenURI = baseURI;
     }
     
+
     /**
      * @dev Get base URI
      */
@@ -116,4 +127,18 @@ contract MetaFloat is ERC721, Ownable, ReentrancyGuard {
     function totalSupply() external view returns (uint256) {
         return _tokenIdCounter.current();
     }
+
+        /**
+     * @dev Admin functions
+     */
+    function addAuthorizedUpdater(address updater) external onlyOwner {
+        authorizedUpdaters[updater] = true;
+        emit AuthorizedUpdaterAdded(updater);
+    }
+    
+    function removeAuthorizedUpdater(address updater) external onlyOwner {
+        authorizedUpdaters[updater] = false;
+        emit AuthorizedUpdaterRemoved(updater);
+    }
+    
 }

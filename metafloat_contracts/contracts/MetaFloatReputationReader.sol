@@ -8,13 +8,27 @@ import "./MetaFloatID.sol";
  * @dev Interface contract for other contracts to easily read reputation data with ID validation
  */
 contract MetaFloatReputationReader {
-    MetaFloatReputation public immutable reputationContract;
-    MetaFloat public immutable metaFloatContract;
+    MetaFloatReputation public  reputationContract;
+    MetaFloat public  metaFloatContract;
+    
+    mapping(address => bool) public authorizedUpdaters;
+
+    event AuthorizedUpdaterAdded(address indexed updater);
+    event AuthorizedUpdaterRemoved(address indexed updater);
+    event MetaFloatContractUpdated(address indexed newContract);
+    event MetaFloatReputationContractUpdated(address indexed newContract);
     
     constructor(address _reputationContract, address _metaFloatContract) {
         reputationContract = MetaFloatReputation(_reputationContract);
         metaFloatContract = MetaFloat(_metaFloatContract);
+        authorizedUpdaters[msg.sender] = true;
     }
+
+    modifier onlyAuthorizedUpdater() {
+        require(authorizedUpdaters[msg.sender], "Not authorized to update reputations");
+        _;
+    }
+    
     
     /**
      * @dev Check if user has valid MetaFloat ID
@@ -39,6 +53,16 @@ contract MetaFloatReputationReader {
         return hasValidMetaFloatID(user) && 
                reputationContract.isUserVerified(user) &&
                reputationContract.meetsMinimumReputation(user, minimumScore);
+    }
+
+    function setMetaFloatContract(address _metaFloatContract) external onlyAuthorizedUpdater {
+        metaFloatContract = MetaFloat(_metaFloatContract);
+        emit MetaFloatContractUpdated(_metaFloatContract);
+    }
+
+    function setMetaFloatReputionContract(address _metaFloatReputionContract) external onlyAuthorizedUpdater {
+        reputationContract = MetaFloatReputation(_metaFloatReputionContract);
+        emit MetaFloatReputationContractUpdated(_metaFloatReputionContract);
     }
     
     /**
@@ -104,5 +128,18 @@ contract MetaFloatReputationReader {
             eligible[i] = hasValidMetaFloatID(users[i]) && 
                          reputationContract.meetsMinimumReputation(users[i], minimumReputation);
         }
+    }
+
+            /**
+     * @dev Admin functions
+     */
+    function addAuthorizedUpdater(address updater) external onlyAuthorizedUpdater {
+        authorizedUpdaters[updater] = true;
+        emit AuthorizedUpdaterAdded(updater);
+    }
+    
+    function removeAuthorizedUpdater(address updater) external onlyAuthorizedUpdater {
+        authorizedUpdaters[updater] = false;
+        emit AuthorizedUpdaterRemoved(updater);
     }
 }

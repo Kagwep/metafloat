@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-
 import "./MetaFloatReputation.sol";
 import "./MetaFloatReputationReader.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -12,7 +11,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
  */
 contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
     
-    MetaFloatReputationReader public immutable reputationReader;
+    MetaFloatReputationReader public  reputationReader;
     MetaFloatReputation public immutable reputationContract;
     
     // Loan tier structure based on reputation
@@ -21,8 +20,8 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
     struct LoanEligibility {
         bool eligible;
         LoanTier maxTier;
-        uint256 maxAmount; // in wei or token units
-        uint16 interestRate; // basis points (e.g., 500 = 5%)
+        uint256 maxAmount; // in USDC (6 decimals)
+        uint16 interestRate; // basis points (100 = 1%)
         string[] requirements;
         string[] reasons;
     }
@@ -34,23 +33,20 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         uint16 minLoyaltyScore;
         uint16 minReliabilityScore;
         uint8 minTrustLevel; // 0=Bronze, 1=Silver, 2=Gold, 3=Platinum
-        uint256 maxLoanAmount;
-        uint16 baseInterestRate; // basis points
+        uint256 maxLoanAmount; // in USDC (6 decimals)
+        uint16 baseInterestRate; // basis points (fixed at 100 = 1%)
     }
     
     mapping(LoanTier => TierConfig) public tierConfigs;
     
     // Additional requirements
     uint256 public constant MIN_PLATFORM_TENURE_DAYS = 7;
-    uint16 public constant MIN_ACTIVITY_SCORE = 200;
-    uint16 public constant CONSISTENCY_WEIGHT = 35; // Most important for loans
-    uint16 public constant RELIABILITY_WEIGHT = 30;
-    uint16 public constant LOYALTY_WEIGHT = 20;
-    uint16 public constant OVERALL_WEIGHT = 15;
+    uint16 public constant MIN_ACTIVITY_SCORE = 100;
+    uint16 public constant FIXED_INTEREST_RATE = 100; // 1% APR for all loans
     
     // Risk adjustment factors
-    mapping(address => uint16) public userRiskAdjustment; // basis points adjustment
     mapping(address => bool) public blacklistedUsers;
+    mapping(address => bool) public authorizedUpdaters;
     
     event LoanEligibilityChecked(
         address indexed user,
@@ -61,8 +57,10 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
     );
     
     event TierConfigUpdated(LoanTier tier, TierConfig config);
-    event UserRiskAdjusted(address indexed user, uint16 adjustment);
     event UserBlacklisted(address indexed user, bool blacklisted);
+    event AuthorizedUpdaterAdded(address indexed updater);
+    event AuthorizedUpdaterRemoved(address indexed updater);
+    event MetaFloatReputationReaderContractUpdated(address indexed newContract);
     
     constructor(
         address _reputationReader,
@@ -73,51 +71,57 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         
         // Initialize default tier configurations
         _initializeDefaultTiers();
+        authorizedUpdaters[msg.sender] = true;
+    }
+
+    modifier onlyAuthorizedUpdater() {
+        require(authorizedUpdaters[msg.sender], "Not authorized to update reputations");
+        _;
     }
     
     function _initializeDefaultTiers() private {
-        // Micro Loans: New users with basic verification
+        // Micro Loans: Entry level - 25 USDC
         tierConfigs[LoanTier.Micro] = TierConfig({
-            minOverallReputation: 300,
-            minConsistencyScore: 250,
-            minLoyaltyScore: 200,
-            minReliabilityScore: 250,
+            minOverallReputation: 600,
+            minConsistencyScore: 600,
+            minLoyaltyScore: 150,
+            minReliabilityScore: 200,
             minTrustLevel: 0, // Bronze
-            maxLoanAmount: 100 ether, // $100 equivalent
-            baseInterestRate: 1200 // 12% APR
+            maxLoanAmount: 25 * 10**6, // 25 USDC
+            baseInterestRate: FIXED_INTEREST_RATE
         });
         
-        // Small Loans: Regular users with good patterns
+        // Small Loans: 50 USDC
         tierConfigs[LoanTier.Small] = TierConfig({
-            minOverallReputation: 500,
-            minConsistencyScore: 450,
-            minLoyaltyScore: 400,
-            minReliabilityScore: 450,
-            minTrustLevel: 1, // Silver
-            maxLoanAmount: 500 ether, // $500 equivalent
-            baseInterestRate: 900 // 9% APR
-        });
-        
-        // Medium Loans: Power users with strong consistency
-        tierConfigs[LoanTier.Medium] = TierConfig({
             minOverallReputation: 700,
-            minConsistencyScore: 650,
-            minLoyaltyScore: 600,
-            minReliabilityScore: 650,
-            minTrustLevel: 2, // Gold
-            maxLoanAmount: 2000 ether, // $2000 equivalent
-            baseInterestRate: 600 // 6% APR
+            minConsistencyScore: 700,
+            minLoyaltyScore: 200,
+            minReliabilityScore: 300,
+            minTrustLevel: 0, // Bronze
+            maxLoanAmount: 50 * 10**6, // 50 USDC
+            baseInterestRate: FIXED_INTEREST_RATE
         });
         
-        // Large Loans: Veterans and whales with exceptional scores
-        tierConfigs[LoanTier.Large] = TierConfig({
-            minOverallReputation: 850,
+        // Medium Loans: 200 USDC
+        tierConfigs[LoanTier.Medium] = TierConfig({
+            minOverallReputation: 800,
             minConsistencyScore: 800,
-            minLoyaltyScore: 750,
-            minReliabilityScore: 800,
-            minTrustLevel: 3, // Platinum
-            maxLoanAmount: 10000 ether, // $10000 equivalent
-            baseInterestRate: 400 // 4% APR
+            minLoyaltyScore: 300,
+            minReliabilityScore: 400,
+            minTrustLevel: 1, // Silver
+            maxLoanAmount: 200 * 10**6, // 200 USDC
+            baseInterestRate: FIXED_INTEREST_RATE
+        });
+        
+        // Large Loans: 1000 USDC - maximum
+        tierConfigs[LoanTier.Large] = TierConfig({
+            minOverallReputation: 950,
+            minConsistencyScore: 950,
+            minLoyaltyScore: 500,
+            minReliabilityScore: 600,
+            minTrustLevel: 2, // Gold
+            maxLoanAmount: 1000 * 10**6, // 1000 USDC
+            baseInterestRate: FIXED_INTEREST_RATE
         });
     }
     
@@ -133,7 +137,7 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
                 maxAmount: 0,
                 interestRate: 0,
                 requirements: new string[](0),
-                reasons: _createArray("User is blacklisted")
+                reasons: _createSingleArray("User is blacklisted")
             });
         }
         
@@ -144,8 +148,8 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
                 maxTier: LoanTier.None,
                 maxAmount: 0,
                 interestRate: 0,
-                requirements: _createArray("Must have valid MetaFloat ID"),
-                reasons: _createArray("No MetaFloat ID found")
+                requirements: _createSingleArray("Must have valid MetaFloat ID"),
+                reasons: _createSingleArray("No MetaFloat ID found")
             });
         }
         
@@ -159,8 +163,8 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
                 maxTier: LoanTier.None,
                 maxAmount: 0,
                 interestRate: 0,
-                requirements: _createArray("Reputation data must be current (updated within 30 days)"),
-                reasons: _createArray("Stale reputation data")
+                requirements: _createSingleArray("Reputation data must be current"),
+                reasons: _createSingleArray("Stale reputation data")
             });
         }
         
@@ -171,8 +175,8 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
                 maxTier: LoanTier.None,
                 maxAmount: 0,
                 interestRate: 0,
-                requirements: _createArray("Minimum activity score required"),
-                reasons: _createArray("Insufficient platform activity")
+                requirements: _createSingleArray("Minimum activity score required"),
+                reasons: _createSingleArray("Insufficient platform activity")
             });
         }
         
@@ -185,22 +189,18 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
                 maxTier: LoanTier.None,
                 maxAmount: 0,
                 interestRate: 0,
-                requirements: _getTierRequirements(LoanTier.Micro),
-                reasons: _createArray("Does not meet minimum loan requirements")
+                requirements: _getTierRequirements(),
+                reasons: _createSingleArray("Minimum 600 consistency and overall reputation required")
             });
         }
-        
-        // Calculate interest rate with risk adjustments
-        uint16 baseRate = tierConfigs[maxTier].baseInterestRate;
-        uint16 adjustedRate = _calculateAdjustedInterestRate(user, profile, baseRate);
         
         return LoanEligibility({
             eligible: true,
             maxTier: maxTier,
             maxAmount: tierConfigs[maxTier].maxLoanAmount,
-            interestRate: adjustedRate,
+            interestRate: FIXED_INTEREST_RATE,
             requirements: new string[](0),
-            reasons: _generateEligibilityReasons(profile, maxTier)
+            reasons: _generateEligibilityReasons(maxTier)
         });
     }
     
@@ -226,94 +226,46 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         return LoanTier.None;
     }
     
-    function _calculateAdjustedInterestRate(
-        address user, 
-        MetaFloatReputation.UserProfile memory profile,
-        uint16 baseRate
-    ) private view returns (uint16) {
-        
-        uint16 adjustedRate = baseRate;
-        
-        // Apply user-specific risk adjustment
-        if (userRiskAdjustment[user] > 0) {
-            adjustedRate += userRiskAdjustment[user];
-        }
-        
-        // Consistency bonus (most important for loans)
-        if (profile.scores.consistencyScore >= 800) {
-            adjustedRate = adjustedRate > 50 ? adjustedRate - 50 : 0; // 0.5% discount
-        } else if (profile.scores.consistencyScore < 400) {
-            adjustedRate += 200; // 2% penalty
-        }
-        
-        // Reliability bonus
-        if (profile.scores.reliabilityScore >= 850) {
-            adjustedRate = adjustedRate > 25 ? adjustedRate - 25 : 0; // 0.25% discount
-        }
-        
-        // Loyalty bonus (long-term users)
-        if (profile.scores.loyaltyScore >= 800) {
-            adjustedRate = adjustedRate > 25 ? adjustedRate - 25 : 0; // 0.25% discount
-        }
-        
-        // Cap the maximum interest rate
-        return adjustedRate > 2000 ? 2000 : adjustedRate; // Max 20% APR
-    }
-    
-    function _getTierRequirements(LoanTier tier) private view returns (string[] memory) {
-        string[] memory requirements = new string[](5);
-        
-        requirements[0] = "Min reputation score";
-        requirements[1] = "Min consistency score";
-        requirements[2] = "Min loyalty score";
-        requirements[3] = "Min reliability score";
-        requirements[4] = "Valid MetaFloat ID";
-        
+    function _getTierRequirements() private pure returns (string[] memory) {
+        string[] memory requirements = new string[](4);
+        requirements[0] = "Min overall reputation: 600";
+        requirements[1] = "Min consistency score: 600";
+        requirements[2] = "Min activity score: 100";
+        requirements[3] = "Valid MetaFloat ID";
         return requirements;
     }
     
-    function _generateEligibilityReasons(
-        MetaFloatReputation.UserProfile memory profile,
-        LoanTier tier
-    ) private pure returns (string[] memory) {
+    function _generateEligibilityReasons(LoanTier tier) private pure returns (string[] memory) {
         string[] memory reasons = new string[](3);
-        
-        reasons[0] = string(abi.encodePacked("Qualified for ", _getTierName(tier), " tier"));
-        reasons[1] = "Strong consistency";
-        reasons[2] = "Reliable user";
-        
+        reasons[0] = string(abi.encodePacked("Qualified for ", _getTierName(tier), " tier loans"));
+        reasons[1] = "Meets reputation requirements";
+        reasons[2] = "Fixed 1% APR for all loans";
         return reasons;
     }
     
     // Admin functions
     function updateTierConfig(LoanTier tier, TierConfig memory config) external onlyOwner {
+        require(config.maxLoanAmount <= 1000 * 10**6, "Maximum loan amount cannot exceed 1000 USDC");
+        require(config.baseInterestRate == FIXED_INTEREST_RATE, "Interest rate must be 1% APR");
         tierConfigs[tier] = config;
         emit TierConfigUpdated(tier, config);
     }
     
-    function adjustUserRisk(address user, uint16 adjustmentBasisPoints) external onlyOwner {
-        userRiskAdjustment[user] = adjustmentBasisPoints;
-        emit UserRiskAdjusted(user, adjustmentBasisPoints);
-    }
-    
-    function setUserBlacklisted(address user, bool blacklisted) external onlyOwner {
+    function setUserBlacklisted(address user, bool blacklisted) external onlyAuthorizedUpdater {
         blacklistedUsers[user] = blacklisted;
         emit UserBlacklisted(user, blacklisted);
     }
+
+        function setMetaFloatReputionContract(address _metaFloatReputionReaderContract) external onlyAuthorizedUpdater {
+        reputationReader = MetaFloatReputationReader(_metaFloatReputionReaderContract);
+        emit MetaFloatReputationReaderContractUpdated(_metaFloatReputionReaderContract);
+    }
     
     // Helper functions
-    function _createArray(string memory item) private pure returns (string[] memory) {
+    function _createSingleArray(string memory item) private pure returns (string[] memory) {
         string[] memory array = new string[](1);
         array[0] = item;
         return array;
-    }
-    
-    function _getTrustLevelName(uint8 level) private pure returns (string memory) {
-        if (level == 0) return "Bronze";
-        if (level == 1) return "Silver";
-        if (level == 2) return "Gold";
-        if (level == 3) return "Platinum";
-        return "Unknown";
     }
     
     function _getTierName(LoanTier tier) private pure returns (string memory) {
@@ -329,11 +281,48 @@ contract MetaFloatLoanEligibility is Ownable, ReentrancyGuard {
         return tierConfigs[tier];
     }
     
-    function getUserRiskAdjustment(address user) external view returns (uint16) {
-        return userRiskAdjustment[user];
-    }
-    
     function isUserBlacklisted(address user) external view returns (bool) {
         return blacklistedUsers[user];
+    }
+    
+    function getMaxTierForUser(address user) external view returns (LoanTier) {
+        if (blacklistedUsers[user] || !reputationReader.hasValidMetaFloatID(user)) {
+            return LoanTier.None;
+        }
+        
+        MetaFloatReputation.UserProfile memory profile = reputationContract.getUserProfile(user);
+        return _getMaxEligibleTier(profile);
+    }
+    
+    function getLoanAmountForTier(LoanTier tier) external view returns (uint256) {
+        return tierConfigs[tier].maxLoanAmount;
+    }
+    
+    // Get all tier information for frontend display
+    function getAllTierConfigs() external view returns (
+        TierConfig memory micro,
+        TierConfig memory small, 
+        TierConfig memory medium,
+        TierConfig memory large
+    ) {
+        return (
+            tierConfigs[LoanTier.Micro],
+            tierConfigs[LoanTier.Small],
+            tierConfigs[LoanTier.Medium],
+            tierConfigs[LoanTier.Large]
+        );
+    }
+
+            /**
+     * @dev Admin functions
+     */
+    function addAuthorizedUpdater(address updater) external onlyOwner {
+        authorizedUpdaters[updater] = true;
+        emit AuthorizedUpdaterAdded(updater);
+    }
+    
+    function removeAuthorizedUpdater(address updater) external onlyOwner {
+        authorizedUpdaters[updater] = false;
+        emit AuthorizedUpdaterRemoved(updater);
     }
 }

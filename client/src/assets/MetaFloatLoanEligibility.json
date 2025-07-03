@@ -3,6 +3,19 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "updater",
+				"type": "address"
+			}
+		],
+		"name": "addAuthorizedUpdater",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "_reputationReader",
 				"type": "address"
 			},
@@ -36,6 +49,32 @@
 		],
 		"name": "OwnableUnauthorizedAccount",
 		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "updater",
+				"type": "address"
+			}
+		],
+		"name": "AuthorizedUpdaterAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "updater",
+				"type": "address"
+			}
+		],
+		"name": "AuthorizedUpdaterRemoved",
+		"type": "event"
 	},
 	{
 		"anonymous": false,
@@ -80,6 +119,19 @@
 			{
 				"indexed": true,
 				"internalType": "address",
+				"name": "newContract",
+				"type": "address"
+			}
+		],
+		"name": "MetaFloatReputationReaderContractUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
 				"name": "previousOwner",
 				"type": "address"
 			},
@@ -92,6 +144,57 @@
 		],
 		"name": "OwnershipTransferred",
 		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "updater",
+				"type": "address"
+			}
+		],
+		"name": "removeAuthorizedUpdater",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_metaFloatReputionReaderContract",
+				"type": "address"
+			}
+		],
+		"name": "setMetaFloatReputionContract",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "blacklisted",
+				"type": "bool"
+			}
+		],
+		"name": "setUserBlacklisted",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"anonymous": false,
@@ -150,6 +253,74 @@
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
+				"name": "tier",
+				"type": "uint8"
+			},
+			{
+				"components": [
+					{
+						"internalType": "uint16",
+						"name": "minOverallReputation",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minConsistencyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minLoyaltyScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint16",
+						"name": "minReliabilityScore",
+						"type": "uint16"
+					},
+					{
+						"internalType": "uint8",
+						"name": "minTrustLevel",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "maxLoanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint16",
+						"name": "baseInterestRate",
+						"type": "uint16"
+					}
+				],
+				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
+				"name": "config",
+				"type": "tuple"
+			}
+		],
+		"name": "updateTierConfig",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -169,39 +340,19 @@
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "FIXED_INTEREST_RATE",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "address",
 				"name": "",
-				"type": "uint16"
+				"type": "address"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "MIN_ACTIVITY_SCORE",
+		"name": "authorizedUpdaters",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint16"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "MIN_PLATFORM_TENURE_DAYS",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -272,6 +423,19 @@
 				"internalType": "struct MetaFloatLoanEligibility.LoanEligibility",
 				"name": "",
 				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "FIXED_INTEREST_RATE",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
 			}
 		],
 		"stateMutability": "view",
@@ -568,6 +732,32 @@
 	},
 	{
 		"inputs": [],
+		"name": "MIN_ACTIVITY_SCORE",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "MIN_PLATFORM_TENURE_DAYS",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "owner",
 		"outputs": [
 			{
@@ -577,13 +767,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -610,24 +793,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "blacklisted",
-				"type": "bool"
-			}
-		],
-		"name": "setUserBlacklisted",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -677,74 +842,6 @@
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "enum MetaFloatLoanEligibility.LoanTier",
-				"name": "tier",
-				"type": "uint8"
-			},
-			{
-				"components": [
-					{
-						"internalType": "uint16",
-						"name": "minOverallReputation",
-						"type": "uint16"
-					},
-					{
-						"internalType": "uint16",
-						"name": "minConsistencyScore",
-						"type": "uint16"
-					},
-					{
-						"internalType": "uint16",
-						"name": "minLoyaltyScore",
-						"type": "uint16"
-					},
-					{
-						"internalType": "uint16",
-						"name": "minReliabilityScore",
-						"type": "uint16"
-					},
-					{
-						"internalType": "uint8",
-						"name": "minTrustLevel",
-						"type": "uint8"
-					},
-					{
-						"internalType": "uint256",
-						"name": "maxLoanAmount",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint16",
-						"name": "baseInterestRate",
-						"type": "uint16"
-					}
-				],
-				"internalType": "struct MetaFloatLoanEligibility.TierConfig",
-				"name": "config",
-				"type": "tuple"
-			}
-		],
-		"name": "updateTierConfig",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ]
